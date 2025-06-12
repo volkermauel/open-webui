@@ -208,6 +208,15 @@ async def get_document_by_reference(ref_id: str, user=Depends(get_verified_user)
     return {"content": doc}
 
 
+@router.get("/sources/{ref_id}")
+async def get_sources_by_reference(ref_id: str, user=Depends(get_verified_user)):
+    """Return stored citation sources by reference id."""
+    sources = reference_store.get_sources(ref_id)
+    if sources is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Sources reference not found")
+    return {"sources": sources}
+
+
 class CollectionNameForm(BaseModel):
     collection_name: Optional[str] = None
 
