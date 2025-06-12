@@ -57,6 +57,7 @@ from open_webui.models.functions import Functions
 from open_webui.models.models import Models
 
 from open_webui.retrieval.utils import get_sources_from_files
+from open_webui.retrieval import reference_store
 
 
 from open_webui.utils.chat import generate_chat_completion
@@ -984,7 +985,9 @@ async def process_chat_payload(request, form_data, user, metadata, model):
     ]
 
     if len(sources) > 0:
-        events.append({"sources": sources})
+        # Store sources server side and send only reference id to reduce payload
+        sources_ref = reference_store.store_sources(sources)
+        events.append({"sources_ref": sources_ref})
 
     if model_knowledge:
         await event_emitter(

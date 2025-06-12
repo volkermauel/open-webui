@@ -2,14 +2,15 @@ import { EventSourceParserStream } from 'eventsource-parser/stream';
 import type { ParsedEvent } from 'eventsource-parser';
 
 type TextStreamUpdate = {
-	done: boolean;
-	value: string;
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	sources?: any;
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	selectedModelId?: any;
-	error?: any;
-	usage?: ResponseUsage;
+        done: boolean;
+        value: string;
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        sources?: any;
+        sourcesRef?: string;
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        selectedModelId?: any;
+        error?: any;
+        usage?: ResponseUsage;
 };
 
 type ResponseUsage = {
@@ -67,10 +68,15 @@ async function* openAIStreamToIterator(
 				break;
 			}
 
-			if (parsedData.sources) {
-				yield { done: false, value: '', sources: parsedData.sources };
-				continue;
-			}
+                        if (parsedData.sources) {
+                                yield { done: false, value: '', sources: parsedData.sources };
+                                continue;
+                        }
+
+                        if (parsedData.sources_ref) {
+                                yield { done: false, value: '', sourcesRef: parsedData.sources_ref };
+                                continue;
+                        }
 
 			if (parsedData.selected_model_id) {
 				yield { done: false, value: '', selectedModelId: parsedData.selected_model_id };
@@ -107,10 +113,14 @@ async function* streamLargeDeltasAsRandomChunks(
 			yield textStreamUpdate;
 			continue;
 		}
-		if (textStreamUpdate.sources) {
-			yield textStreamUpdate;
-			continue;
-		}
+                if (textStreamUpdate.sources) {
+                        yield textStreamUpdate;
+                        continue;
+                }
+                if (textStreamUpdate.sourcesRef) {
+                        yield textStreamUpdate;
+                        continue;
+                }
 		if (textStreamUpdate.selectedModelId) {
 			yield textStreamUpdate;
 			continue;
