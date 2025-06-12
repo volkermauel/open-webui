@@ -1,22 +1,42 @@
 <script lang="ts">
 	import { getContext } from 'svelte';
-	import CitationsModal from './CitationsModal.svelte';
-	import Collapsible from '$lib/components/common/Collapsible.svelte';
-	import ChevronDown from '$lib/components/icons/ChevronDown.svelte';
-	import ChevronUp from '$lib/components/icons/ChevronUp.svelte';
+        import CitationsModal from './CitationsModal.svelte';
+        import Collapsible from '$lib/components/common/Collapsible.svelte';
+        import ChevronDown from '$lib/components/icons/ChevronDown.svelte';
+        import ChevronUp from '$lib/components/icons/ChevronUp.svelte';
+        import { getCitationsByReference } from '$lib/apis/retrieval';
 
 	const i18n = getContext('i18n');
 
 	export let id = '';
-	export let sources = [];
+        export let sources = [];
+        export let sourcesRef: string | null = null;
 
 	let citations = [];
 	let showPercentage = false;
 	let showRelevance = true;
 
-	let showCitationModal = false;
-	let selectedCitation: any = null;
-	let isCollapsibleOpen = false;
+let showCitationModal = false;
+let selectedCitation: any = null;
+let isCollapsibleOpen = false;
+
+$: if (showCitationModal) {
+        loadSources();
+        if (citations.length > 0 && !selectedCitation) {
+                selectedCitation = citations[0];
+        }
+}
+
+async function loadSources() {
+        if (sourcesRef && sources.length === 0) {
+                try {
+                        const res = await getCitationsByReference(sourcesRef);
+                        sources = res.citations ?? [];
+                } catch (e) {
+                        console.error(e);
+                }
+        }
+}
 
 	function calculateShowRelevance(sources: any[]) {
 		const distances = sources.flatMap((citation) => citation.distances ?? []);
@@ -42,9 +62,12 @@
 		return distances.every((d) => d !== undefined && d >= -1 && d <= 1);
 	}
 
-	$: {
-		console.log('sources', sources);
-                citations = sources.reduce((acc, source) => {
+$: {
+        if (sources.length === 0) {
+                loadSources();
+        }
+        console.log('sources', sources);
+        citations = sources.reduce((acc, source) => {
                         if (Object.keys(source).length === 0) {
                                 return acc;
                         }
@@ -214,4 +237,16 @@
 			</Collapsible>
 		{/if}
 	</div>
+{/if}
+{:else if sourcesRef}
+        <div class="py-0.5 -mx-0.5 w-full flex gap-1">
+                <button
+                        class="no-toggle outline-hidden flex text-xs dark:text-gray-300 p-1 bg-white dark:bg-gray-900 rounded-xl"
+                        on:click={() => {
+                                showCitationModal = true;
+                        }}
+                >
+                        {$i18n.t('View references')}
+                </button>
+        </div>
 {/if}

@@ -29,6 +29,7 @@ from open_webui.socket.main import (
     get_event_emitter,
     get_active_status_by_user_id,
 )
+from open_webui.retrieval import reference_store
 from open_webui.routers.tasks import (
     generate_queries,
     generate_title,
@@ -984,7 +985,8 @@ async def process_chat_payload(request, form_data, user, metadata, model):
     ]
 
     if len(sources) > 0:
-        events.append({"sources": sources})
+        ref_id = reference_store.store_citations(sources)
+        events.append({"sources_ref": ref_id})
 
     if model_knowledge:
         await event_emitter(

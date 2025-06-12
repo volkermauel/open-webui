@@ -204,8 +204,21 @@ async def get_document_by_reference(ref_id: str, user=Depends(get_verified_user)
     """Return a stored document snippet by reference id."""
     doc = reference_store.get_document(ref_id)
     if doc is None:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Document reference not found")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Document reference not found"
+        )
     return {"content": doc}
+
+
+@router.get("/citations/{ref_id}")
+async def get_citations_by_reference(ref_id: str, user=Depends(get_verified_user)):
+    """Return stored citation data by reference id."""
+    citations = reference_store.get_citations(ref_id)
+    if citations is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Citation reference not found"
+        )
+    return {"citations": citations}
 
 
 class CollectionNameForm(BaseModel):
