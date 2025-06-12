@@ -552,5 +552,32 @@ export const resetVectorDB = async (token: string) => {
 		throw error;
 	}
 
-	return res;
+        return res;
+};
+
+export const getDocumentByReference = async (id: string) => {
+        let error = null;
+
+        const res = await fetch(`${RETRIEVAL_API_BASE_URL}/document/${id}`, {
+                method: 'GET',
+                headers: {
+                        Accept: 'application/json'
+                },
+                credentials: 'include'
+        })
+                .then(async (res) => {
+                        if (!res.ok) throw await res.json();
+                        return res.json();
+                })
+                .catch((err) => {
+                        error = err.detail;
+                        console.error(err);
+                        return null;
+                });
+
+        if (error) {
+                throw error;
+        }
+
+        return res;
 };

@@ -19,6 +19,7 @@ from open_webui.models.users import UserModel
 from open_webui.models.files import Files
 
 from open_webui.retrieval.vector.main import GetResult
+from open_webui.retrieval import reference_store
 
 
 from open_webui.env import (
@@ -599,9 +600,16 @@ def get_sources_from_files(
         try:
             if "documents" in context:
                 if "metadatas" in context:
+                    # Replace raw documents with references to avoid sending
+                    # large payloads back to the client.
+                    document_refs = [
+                        reference_store.store_document(doc)
+                        for doc in context["documents"][0]
+                    ]
+
                     source = {
                         "source": context["file"],
-                        "document": context["documents"][0],
+                        "document": document_refs,
                         "metadata": context["metadatas"][0],
                     }
                     if "distances" in context and context["distances"]:

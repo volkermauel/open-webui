@@ -44,14 +44,16 @@
 
 	$: {
 		console.log('sources', sources);
-		citations = sources.reduce((acc, source) => {
-			if (Object.keys(source).length === 0) {
-				return acc;
-			}
+                citations = sources.reduce((acc, source) => {
+                        if (Object.keys(source).length === 0) {
+                                return acc;
+                        }
 
-			source.document.forEach((document, index) => {
-				const metadata = source.metadata?.[index];
-				const distance = source.distances?.[index];
+                        const documents = source.document ?? new Array(source.metadata?.length ?? 0).fill(null);
+
+                        documents.forEach((document, index) => {
+                                const metadata = source.metadata?.[index];
+                                const distance = source.distances?.[index];
 
 				// Within the same citation there could be multiple documents
 				const id = metadata?.source ?? source?.source?.id ?? 'N/A';
@@ -65,21 +67,21 @@
 					_source = { ..._source, name: id, url: id };
 				}
 
-				const existingSource = acc.find((item) => item.id === id);
+                                const existingSource = acc.find((item) => item.id === id);
 
-				if (existingSource) {
-					existingSource.document.push(document);
-					existingSource.metadata.push(metadata);
-					if (distance !== undefined) existingSource.distances.push(distance);
-				} else {
-					acc.push({
-						id: id,
-						source: _source,
-						document: [document],
-						metadata: metadata ? [metadata] : [],
-						distances: distance !== undefined ? [distance] : undefined
-					});
-				}
+                                if (existingSource) {
+                                        existingSource.document.push(document);
+                                        existingSource.metadata.push(metadata);
+                                        if (distance !== undefined) existingSource.distances.push(distance);
+                                } else {
+                                        acc.push({
+                                                id: id,
+                                                source: _source,
+                                                document: [document],
+                                                metadata: metadata ? [metadata] : [],
+                                                distances: distance !== undefined ? [distance] : undefined
+                                        });
+                                }
 			});
 			return acc;
 		}, []);
