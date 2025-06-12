@@ -1360,7 +1360,7 @@ def process_file(
             file_path = file.path
             if file_path:
                 file_path = Storage.get_file(file_path)
-                loader = Loader(
+                loader_kwargs = dict(
                     engine=request.app.state.config.CONTENT_EXTRACTION_ENGINE,
                     DATALAB_MARKER_API_KEY=request.app.state.config.DATALAB_MARKER_API_KEY,
                     DATALAB_MARKER_LANGS=request.app.state.config.DATALAB_MARKER_LANGS,
@@ -1383,14 +1383,27 @@ def process_file(
                         "picture_description_local": request.app.state.config.DOCLING_PICTURE_DESCRIPTION_LOCAL,
                         "picture_description_api": request.app.state.config.DOCLING_PICTURE_DESCRIPTION_API,
                     },
-                    PDF_EXTRACT_IMAGES=request.app.state.config.PDF_EXTRACT_IMAGES,
                     DOCUMENT_INTELLIGENCE_ENDPOINT=request.app.state.config.DOCUMENT_INTELLIGENCE_ENDPOINT,
                     DOCUMENT_INTELLIGENCE_KEY=request.app.state.config.DOCUMENT_INTELLIGENCE_KEY,
                     MISTRAL_OCR_API_KEY=request.app.state.config.MISTRAL_OCR_API_KEY,
                 )
-                docs = loader.load(
-                    file.filename, file.meta.get("content_type"), file_path
-                )
+                loader = Loader(PDF_EXTRACT_IMAGES=request.app.state.config.PDF_EXTRACT_IMAGES, **loader_kwargs)
+                try:
+                    docs = loader.load(
+                        file.filename, file.meta.get("content_type"), file_path
+                    )
+                except ValueError as e:
+                    if "cannot reshape array" in str(e) and request.app.state.config.PDF_EXTRACT_IMAGES:
+                        log.warning(
+                            "PDF image extraction failed for %s, retrying without images",
+                            file.filename,
+                        )
+                        loader = Loader(PDF_EXTRACT_IMAGES=False, **loader_kwargs)
+                        docs = loader.load(
+                            file.filename, file.meta.get("content_type"), file_path
+                        )
+                    else:
+                        raise
 
                 docs = [
                     Document(
