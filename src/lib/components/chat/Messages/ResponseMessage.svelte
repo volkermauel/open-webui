@@ -848,9 +848,9 @@
 									<Error content={message?.error?.content ?? message.content} />
 								{/if}
 
-								{#if (message?.sources || message?.citations) && (model?.info?.meta?.capabilities?.citations ?? true)}
-									<Citations id={message?.id} sources={message?.sources ?? message?.citations} />
-								{/if}
+                                                                {#if (message?.sourcesRef || message?.sources || message?.citations) && (model?.info?.meta?.capabilities?.citations ?? true)}
+                                                                        <Citations id={message?.id} sources={message?.sources ?? message?.citations} sourcesRef={message?.sourcesRef} />
+                                                                {/if}
 
 								{#if message.code_executions}
 									<CodeExecutions codeExecutions={message.code_executions} />

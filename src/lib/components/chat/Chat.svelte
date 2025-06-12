@@ -331,14 +331,18 @@
 						}
 
 						message.code_executions = message.code_executions;
-					} else {
-						// Regular source.
-						if (message?.sources) {
-							message.sources.push(data);
-						} else {
-							message.sources = [data];
-						}
-					}
+                                        } else {
+                                                // Regular source or citation reference.
+                                                if (data?.sources_ref) {
+                                                        message.sourcesRef = data.sources_ref;
+                                                } else {
+                                                        if (message?.sources) {
+                                                                message.sources.push(data);
+                                                        } else {
+                                                                message.sources = [data];
+                                                        }
+                                                }
+                                        }
 				} else if (type === 'notification') {
 					const toastType = data?.type ?? 'info';
 					const toastContent = data?.content ?? '';
@@ -1181,16 +1185,20 @@
 		}
 	};
 
-	const chatCompletionEventHandler = async (data, message, chatId) => {
-		const { id, done, choices, content, sources, selected_model_id, error, usage } = data;
+       const chatCompletionEventHandler = async (data, message, chatId) => {
+               const { id, done, choices, content, sources, sourcesRef, selected_model_id, error, usage } = data;
 
 		if (error) {
 			await handleOpenAIError(error, message);
 		}
 
-		if (sources) {
-			message.sources = sources;
-		}
+               if (sources) {
+                       message.sources = sources;
+               }
+
+               if (sourcesRef) {
+                       message.sourcesRef = sourcesRef;
+               }
 
 		if (choices) {
 			if (choices[0]?.message?.content) {
@@ -1907,15 +1915,19 @@
 
 			if (res && res.ok && res.body) {
 				const textStream = await createOpenAITextStream(res.body, $settings.splitLargeChunks);
-				for await (const update of textStream) {
-					const { value, done, sources, error, usage } = update;
+                               for await (const update of textStream) {
+                                       const { value, done, sources, sourcesRef, error, usage } = update;
 					if (error || done) {
 						break;
 					}
 
-					if (mergedResponse.content == '' && value == '\n') {
-						continue;
-					} else {
+                                       if (sourcesRef) {
+                                               message.sourcesRef = sourcesRef;
+                                       }
+
+                                       if (mergedResponse.content == '' && value == '\n') {
+                                               continue;
+                                       } else {
 						mergedResponse.content += value;
 						history.messages[messageId] = message;
 					}
