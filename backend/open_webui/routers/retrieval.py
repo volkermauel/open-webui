@@ -66,6 +66,7 @@ from open_webui.retrieval.web.perplexity import search_perplexity
 from open_webui.retrieval.web.sougou import search_sougou
 from open_webui.retrieval.web.firecrawl import search_firecrawl
 from open_webui.retrieval.web.external import search_external
+from open_webui.retrieval import reference_store
 
 from open_webui.retrieval.utils import (
     get_embedding_function,
@@ -196,6 +197,28 @@ def get_rf(
 
 
 router = APIRouter()
+
+
+@router.get("/document/{ref_id}")
+async def get_document_by_reference(ref_id: str, user=Depends(get_verified_user)):
+    """Return a stored document snippet by reference id."""
+    doc = reference_store.get_document(ref_id)
+    if doc is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Document reference not found"
+        )
+    return {"content": doc}
+
+
+@router.get("/citations/{ref_id}")
+async def get_citations_by_reference(ref_id: str, user=Depends(get_verified_user)):
+    """Return stored citation data by reference id."""
+    citations = reference_store.get_citations(ref_id)
+    if citations is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Citation reference not found"
+        )
+    return {"citations": citations}
 
 
 class CollectionNameForm(BaseModel):
