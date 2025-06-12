@@ -580,6 +580,7 @@ export const getDocumentByReference = async (id: string) => {
         }
 
         return res;
+
 };
 
 export const getCitationsByReference = async (id: string) => {
@@ -607,4 +608,5 @@ export const getCitationsByReference = async (id: string) => {
         }
 
         return res;
+
 };

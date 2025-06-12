@@ -9,11 +9,13 @@ DOCUMENT_REFERENCES: Dict[str, str] = {}
 CITATION_REFERENCES: Dict[str, list] = {}
 
 
+
 def store_document(content: str) -> str:
     """Store a document snippet and return its reference id."""
     ref_id = str(uuid.uuid4())
     DOCUMENT_REFERENCES[ref_id] = content
     return ref_id
+
 
 
 def get_document(ref_id: str) -> str | None:
@@ -31,3 +33,8 @@ def store_citations(citations: list) -> str:
 def get_citations(ref_id: str) -> list | None:
     """Retrieve citations by reference id."""
     return CITATION_REFERENCES.get(ref_id)
+
+def get_document(ref_id: str) -> str | None:
+    """Retrieve a document snippet by reference id."""
+    return DOCUMENT_REFERENCES.get(ref_id)
+
