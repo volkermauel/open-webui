@@ -2110,16 +2110,18 @@
 									transparentBackground={$settings?.backgroundImageUrl ?? false}
 									{stopResponse}
 									{createMessagePair}
-									onChange={(input) => {
-										if (input.prompt !== null) {
-											localStorage.setItem(
-												`chat-input${$chatId ? `-${$chatId}` : ''}`,
-												JSON.stringify(input)
-											);
-										} else {
-											localStorage.removeItem(`chat-input${$chatId ? `-${$chatId}` : ''}`);
-										}
-									}}
+                                                                        onChange={(input) => {
+                                                                               if (!$temporaryChatEnabled) {
+                                                                                       if (input.prompt !== null) {
+                                                                                               localStorage.setItem(
+                                                                                                       `chat-input${$chatId ? `-${$chatId}` : ''}`,
+                                                                                                       JSON.stringify(input)
+                                                                                               );
+                                                                                       } else {
+                                                                                               localStorage.removeItem(`chat-input${$chatId ? `-${$chatId}` : ''}`);
+                                                                                       }
+                                                                               }
+                                                                        }}
 									on:upload={async (e) => {
 										const { type, data } = e.detail;
 
