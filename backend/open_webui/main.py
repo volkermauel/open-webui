@@ -8,6 +8,7 @@ import shutil
 import sys
 import time
 import random
+import types
 from uuid import uuid4
 
 
@@ -448,6 +449,33 @@ from open_webui.tasks import (
 from open_webui.utils.redis import get_sentinels_from_env
 
 
+async def startup_reindex_missing(app: FastAPI) -> None:
+    """Reindex knowledge bases missing vector collections in the background."""
+    from open_webui.models.knowledge import Knowledges
+    from open_webui.models.files import Files
+    from open_webui.routers.knowledge import ProcessFileForm, process_file
+    from open_webui.retrieval.vector.factory import VECTOR_DB_CLIENT
+
+    dummy_request = types.SimpleNamespace(app=app)
+
+    for kb in Knowledges.get_knowledge_bases():
+        if kb.data and VECTOR_DB_CLIENT.has_collection(collection_name=kb.id):
+            continue
+
+        file_ids = kb.data.get("file_ids", []) if kb.data else []
+        files = Files.get_files_by_ids(file_ids)
+        for file in files:
+            try:
+                await asyncio.to_thread(
+                    process_file,
+                    dummy_request,
+                    ProcessFileForm(file_id=file.id, collection_name=kb.id),
+                    None,
+                )
+            except Exception as e:  # pragma: no cover - startup logging only
+                log.error(f"Startup reindex failed for {file.filename}: {e}")
+
+
 if SAFE_MODE:
     print("SAFE MODE ENABLED")
     Functions.deactivate_all_functions()
@@ -523,6 +551,7 @@ async def lifespan(app: FastAPI):
         limiter.total_tokens = THREAD_POOL_SIZE
 
     asyncio.create_task(periodic_usage_pool_cleanup())
+    asyncio.create_task(startup_reindex_missing(app))
 
     yield
 
