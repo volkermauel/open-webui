@@ -48,10 +48,10 @@
 	import ContentRenderer from './ContentRenderer.svelte';
 	import { KokoroWorker } from '$lib/workers/KokoroWorker';
 	import FileItem from '$lib/components/common/FileItem.svelte';
-import FollowUps from './ResponseMessage/FollowUps.svelte';
-import { fade } from 'svelte/transition';
-import { flyAndScale } from '$lib/utils/transitions';
-import { getSourcesByReference } from '$lib/apis/retrieval';
+	import FollowUps from './ResponseMessage/FollowUps.svelte';
+	import { fade } from 'svelte/transition';
+	import { flyAndScale } from '$lib/utils/transitions';
+	import { getSourcesByReference } from '$lib/apis/retrieval';
 
 	interface MessageType {
 		id: string;
@@ -76,8 +76,8 @@ import { getSourcesByReference } from '$lib/apis/retrieval';
 		};
 		done: boolean;
 		error?: boolean | { content: string };
-                sources?: string[];
-                sourcesRef?: string;
+		sources?: string[];
+		sourcesRef?: string;
 		code_executions?: {
 			uuid: string;
 			name: string;
@@ -107,9 +107,9 @@ import { getSourcesByReference } from '$lib/apis/retrieval';
 
 	export let chatId = '';
 	export let history;
-export let messageId;
+	export let messageId;
 
-let message: MessageType = JSON.parse(JSON.stringify(history.messages[messageId]));
+	let message: MessageType = JSON.parse(JSON.stringify(history.messages[messageId]));
 	$: if (history.messages) {
 		if (JSON.stringify(message) !== JSON.stringify(history.messages[messageId])) {
 			message = JSON.parse(JSON.stringify(history.messages[messageId]));
@@ -125,21 +125,21 @@ let message: MessageType = JSON.parse(JSON.stringify(history.messages[messageId]
 	export let updateChat: Function;
 	export let editMessage: Function;
 	export let saveMessage: Function;
-export let rateMessage: Function;
+	export let rateMessage: Function;
 
-let loadingSources = false;
+	let loadingSources = false;
 
-async function loadSources() {
-        if (message.sources || !message.sourcesRef) return;
-        loadingSources = true;
-        try {
-                const res = await getSourcesByReference(message.sourcesRef);
-                message.sources = res.sources;
-        } catch (e) {
-                console.error(e);
-        }
-        loadingSources = false;
-}
+	async function loadSources() {
+		if (message.sources || !message.sourcesRef) return;
+		loadingSources = true;
+		try {
+			const res = await getSourcesByReference(message.sourcesRef);
+			message.sources = res.sources;
+		} catch (e) {
+			console.error(e);
+		}
+		loadingSources = false;
+	}
 	export let actionMessage: Function;
 	export let deleteMessage: Function;
 
@@ -864,17 +864,21 @@ async function loadSources() {
 									<Error content={message?.error?.content ?? message.content} />
 								{/if}
 
-                                                                {#if (message?.sources || message?.citations) && (model?.info?.meta?.capabilities?.citations ?? true)}
-                                                                        <Citations id={message?.id} sources={message.sources ?? message.citations} />
-                                                                {:else if message?.sourcesRef && (model?.info?.meta?.capabilities?.citations ?? true)}
-                                                                        <button class="text-xs underline" on:click={loadSources} disabled={loadingSources}>
-                                                                                {#if loadingSources}
-                                                                                        Loading references...
-                                                                                {:else}
-                                                                                        Show references
-                                                                                {/if}
-                                                                        </button>
-                                                                {/if}
+								{#if (message?.sources || message?.citations) && (model?.info?.meta?.capabilities?.citations ?? true)}
+									<Citations id={message?.id} sources={message.sources ?? message.citations} />
+								{:else if message?.sourcesRef && (model?.info?.meta?.capabilities?.citations ?? true)}
+									<button
+										class="text-xs underline"
+										on:click={loadSources}
+										disabled={loadingSources}
+									>
+										{#if loadingSources}
+											Loading references...
+										{:else}
+											Show references
+										{/if}
+									</button>
+								{/if}
 
 								{#if message.code_executions}
 									<CodeExecutions codeExecutions={message.code_executions} />

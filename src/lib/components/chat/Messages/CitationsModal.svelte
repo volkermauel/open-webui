@@ -1,9 +1,9 @@
 <script lang="ts">
-        import { getContext } from 'svelte';
-        import Modal from '$lib/components/common/Modal.svelte';
-        import Tooltip from '$lib/components/common/Tooltip.svelte';
-        import { WEBUI_API_BASE_URL } from '$lib/constants';
-        import { getDocumentByReference } from '$lib/apis/retrieval';
+	import { getContext } from 'svelte';
+	import Modal from '$lib/components/common/Modal.svelte';
+	import Tooltip from '$lib/components/common/Tooltip.svelte';
+	import { WEBUI_API_BASE_URL } from '$lib/constants';
+	import { getDocumentByReference } from '$lib/apis/retrieval';
 
 	const i18n = getContext('i18n');
 
@@ -12,21 +12,21 @@
 	export let showPercentage = false;
 	export let showRelevance = true;
 
-        let mergedDocuments = [];
+	let mergedDocuments = [];
 
-        async function loadDocuments() {
-                for (const doc of mergedDocuments) {
-                        if (!doc.document && doc.documentRef) {
-                                try {
-                                        const res = await getDocumentByReference(doc.documentRef);
-                                        doc.document = res.content;
-                                } catch (e) {
-                                        console.error(e);
-                                        doc.document = '';
-                                }
-                        }
-                }
-        }
+	async function loadDocuments() {
+		for (const doc of mergedDocuments) {
+			if (!doc.document && doc.documentRef) {
+				try {
+					const res = await getDocumentByReference(doc.documentRef);
+					doc.document = res.content;
+				} catch (e) {
+					console.error(e);
+					doc.document = '';
+				}
+			}
+		}
+	}
 
 	function calculatePercentage(distance: number) {
 		if (typeof distance !== 'number') return null;
@@ -45,30 +45,30 @@
 		return 'bg-red-200 dark:bg-red-800 text-red-800 dark:text-red-200';
 	}
 
-        $: if (citation) {
-                const docs = citation.document ?? new Array(citation.metadata?.length ?? 0).fill(null);
-                mergedDocuments = docs.map((c, i) => {
-                        return {
-                                source: citation.source,
-                                documentRef: c,
-                                document: null,
-                                metadata: citation.metadata?.[i],
-                                distance: citation.distances?.[i]
-                        };
-                });
-                if (mergedDocuments.every((doc) => doc.distance !== undefined)) {
-                        mergedDocuments = mergedDocuments.sort(
-                                (a, b) => (b.distance ?? Infinity) - (a.distance ?? Infinity)
-                        );
-                }
-                if (show) {
-                        loadDocuments();
-                }
-        }
+	$: if (citation) {
+		const docs = citation.document ?? new Array(citation.metadata?.length ?? 0).fill(null);
+		mergedDocuments = docs.map((c, i) => {
+			return {
+				source: citation.source,
+				documentRef: c,
+				document: null,
+				metadata: citation.metadata?.[i],
+				distance: citation.distances?.[i]
+			};
+		});
+		if (mergedDocuments.every((doc) => doc.distance !== undefined)) {
+			mergedDocuments = mergedDocuments.sort(
+				(a, b) => (b.distance ?? Infinity) - (a.distance ?? Infinity)
+			);
+		}
+		if (show) {
+			loadDocuments();
+		}
+	}
 
-        $: if (show) {
-                loadDocuments();
-        }
+	$: if (show) {
+		loadDocuments();
+	}
 
 	const decodeString = (str: string) => {
 		try {
@@ -203,21 +203,21 @@
 						<div class=" text-sm font-medium dark:text-gray-300 mt-2">
 							{$i18n.t('Content')}
 						</div>
-                                                {#if document.document === null}
-                                                        <div>{$i18n.t('Loading...')}</div>
-                                                {:else if document.metadata?.html}
-                                                        <iframe
-                                                                class="w-full border-0 h-auto rounded-none"
-                                                                sandbox="allow-scripts allow-forms allow-same-origin"
-                                                                srcdoc={document.document}
-                                                                title={$i18n.t('Content')}
-                                                        ></iframe>
-                                                {:else}
-                                                        <pre class="text-sm dark:text-gray-400 whitespace-pre-line">
+						{#if document.document === null}
+							<div>{$i18n.t('Loading...')}</div>
+						{:else if document.metadata?.html}
+							<iframe
+								class="w-full border-0 h-auto rounded-none"
+								sandbox="allow-scripts allow-forms allow-same-origin"
+								srcdoc={document.document}
+								title={$i18n.t('Content')}
+							></iframe>
+						{:else}
+							<pre class="text-sm dark:text-gray-400 whitespace-pre-line">
                 {document.document}
               </pre>
-                                                {/if}
-                                        </div>
+						{/if}
+					</div>
 
 					{#if documentIdx !== mergedDocuments.length - 1}
 						<hr class="border-gray-100 dark:border-gray-850 my-3" />

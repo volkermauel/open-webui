@@ -333,11 +333,11 @@
 						message.code_executions = message.code_executions;
 					} else {
 						// Regular source.
-                                                if (message?.sources) {
-                                                        message.sources.push(data);
-                                                } else {
-                                                        message.sources = [data];
-                                                }
+						if (message?.sources) {
+							message.sources.push(data);
+						} else {
+							message.sources = [data];
+						}
 					}
 				} else if (type === 'notification') {
 					const toastType = data?.type ?? 'info';
@@ -1181,20 +1181,21 @@
 		}
 	};
 
-       const chatCompletionEventHandler = async (data, message, chatId) => {
-               const { id, done, choices, content, sources, sourcesRef, selected_model_id, error, usage } = data;
+	const chatCompletionEventHandler = async (data, message, chatId) => {
+		const { id, done, choices, content, sources, sourcesRef, selected_model_id, error, usage } =
+			data;
 
 		if (error) {
 			await handleOpenAIError(error, message);
 		}
 
-               if (sources) {
-                       message.sources = sources;
-               }
+		if (sources) {
+			message.sources = sources;
+		}
 
-               if (sourcesRef) {
-                       message.sourcesRef = sourcesRef;
-               }
+		if (sourcesRef) {
+			message.sourcesRef = sourcesRef;
+		}
 
 		if (choices) {
 			if (choices[0]?.message?.content) {
