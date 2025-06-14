@@ -771,6 +771,7 @@
 	"LLMs can make mistakes. Verify important information.": "LLM-id võivad teha vigu. Kontrollige olulist teavet.",
 	"Loader": "Laadija",
 	"Loading Kokoro.js...": "Kokoro.js laadimine...",
+	"Loading...": "",
 	"Local": "Kohalik",
 	"Local Task Model": "",
 	"Location access not allowed": "Asukoha juurdepääs pole lubatud",

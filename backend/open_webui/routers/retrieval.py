@@ -204,7 +204,9 @@ async def get_document_by_reference(ref_id: str, user=Depends(get_verified_user)
     """Return a stored document snippet by reference id."""
     doc = reference_store.get_document(ref_id)
     if doc is None:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Document reference not found")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Document reference not found"
+        )
     return {"content": doc}
 
 
@@ -213,7 +215,9 @@ async def get_sources_by_reference(ref_id: str, user=Depends(get_verified_user))
     """Return stored citation sources by reference id."""
     sources = reference_store.get_sources(ref_id)
     if sources is None:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Sources reference not found")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Sources reference not found"
+        )
     return {"sources": sources}
 
 
@@ -1387,13 +1391,19 @@ def process_file(
                     DOCUMENT_INTELLIGENCE_KEY=request.app.state.config.DOCUMENT_INTELLIGENCE_KEY,
                     MISTRAL_OCR_API_KEY=request.app.state.config.MISTRAL_OCR_API_KEY,
                 )
-                loader = Loader(PDF_EXTRACT_IMAGES=request.app.state.config.PDF_EXTRACT_IMAGES, **loader_kwargs)
+                loader = Loader(
+                    PDF_EXTRACT_IMAGES=request.app.state.config.PDF_EXTRACT_IMAGES,
+                    **loader_kwargs,
+                )
                 try:
                     docs = loader.load(
                         file.filename, file.meta.get("content_type"), file_path
                     )
                 except ValueError as e:
-                    if "cannot reshape array" in str(e) and request.app.state.config.PDF_EXTRACT_IMAGES:
+                    if (
+                        "cannot reshape array" in str(e)
+                        and request.app.state.config.PDF_EXTRACT_IMAGES
+                    ):
                         log.warning(
                             "PDF image extraction failed for %s, retrying without images",
                             file.filename,

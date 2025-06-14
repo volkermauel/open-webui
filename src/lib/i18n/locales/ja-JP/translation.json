@@ -771,6 +771,7 @@
 	"LLMs can make mistakes. Verify important information.": "LLM は間違いを犯す可能性があります。重要な情報を検証してください。",
 	"Loader": "ローダー",
 	"Loading Kokoro.js...": "Kokoro.js を読み込んでいます...",
+	"Loading...": "",
 	"Local": "ローカル",
 	"Local Task Model": "",
 	"Location access not allowed": "位置情報のアクセスが許可されていません",

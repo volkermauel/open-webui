@@ -771,6 +771,7 @@
 	"LLMs can make mistakes. Verify important information.": "LLMs могут допускать ошибки. Проверяйте важную информацию.",
 	"Loader": "Загрузчик",
 	"Loading Kokoro.js...": "Загрузка Kokoro.js",
+	"Loading...": "",
 	"Local": "Локально",
 	"Local Task Model": "Модель локальной задачи",
 	"Location access not allowed": "Доступ к местоположению запрещен",

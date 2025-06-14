@@ -771,6 +771,7 @@
 	"LLMs can make mistakes. Verify important information.": "LLMs ལ་ནོར་འཁྲུལ་ཡོང་སྲིད། གནས་ཚུལ་གལ་ཆེན་ར་སྤྲོད་བྱེད་རོགས།",
 	"Loader": "ནང་འཇུག་བྱེད་པོ།",
 	"Loading Kokoro.js...": "Kokoro.js ནང་འཇུག་བྱེད་བཞིན་པ།...",
+	"Loading...": "",
 	"Local": "ས་གནས།",
 	"Local Task Model": "",
 	"Location access not allowed": "གནས་ཡུལ་འཛུལ་སྤྱོད་ལ་གནང་བ་མ་སྤྲད།",

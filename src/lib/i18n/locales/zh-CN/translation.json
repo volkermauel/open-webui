@@ -771,6 +771,7 @@
 	"LLMs can make mistakes. Verify important information.": "大语言模型可能会生成误导性错误信息，请对关键信息加以验证",
 	"Loader": "加载器",
 	"Loading Kokoro.js...": "载入 Kokoro.js...",
+	"Loading...": "",
 	"Local": "本地",
 	"Local Task Model": "本地任务模型",
 	"Location access not allowed": "不允许访问位置信息",

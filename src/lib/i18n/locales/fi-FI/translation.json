@@ -771,6 +771,7 @@
 	"LLMs can make mistakes. Verify important information.": "Kielimallit voivat tehdä virheitä. Tarkista tärkeät tiedot.",
 	"Loader": "Lataaja",
 	"Loading Kokoro.js...": "Ladataan Kokoro.js...",
+	"Loading...": "",
 	"Local": "Paikallinen",
 	"Local Task Model": "Paikallinen työmalli",
 	"Location access not allowed": "Ei pääsyä sijaintitietoihin",
