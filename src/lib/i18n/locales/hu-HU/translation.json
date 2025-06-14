@@ -771,6 +771,7 @@
 	"LLMs can make mistakes. Verify important information.": "Az LLM-ek hibázhatnak. Ellenőrizze a fontos információkat.",
 	"Loader": "Betöltő",
 	"Loading Kokoro.js...": "Kokoro.js betöltése...",
+	"Loading...": "",
 	"Local": "Helyi",
 	"Local Task Model": "",
 	"Location access not allowed": "Helyhozzáférés nem engedélyezett",

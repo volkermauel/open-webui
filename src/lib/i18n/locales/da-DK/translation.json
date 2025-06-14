@@ -771,6 +771,7 @@
 	"LLMs can make mistakes. Verify important information.": "LLM'er kan lave fejl. Bekræft vigtige oplysninger.",
 	"Loader": "Loader",
 	"Loading Kokoro.js...": "Indlæser Kokoro.js...",
+	"Loading...": "",
 	"Local": "Lokal",
 	"Local Task Model": "",
 	"Location access not allowed": "Adgang til placering ikke tilladt",
