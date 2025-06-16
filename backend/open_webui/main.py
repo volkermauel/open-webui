@@ -902,6 +902,7 @@ app.state.EMBEDDING_FUNCTION = get_embedding_function(
         )
     ),
     app.state.config.RAG_EMBEDDING_BATCH_SIZE,
+    embedding_threads=app.state.config.RAG_EMBEDDING_THREADS,
     azure_api_version=(
         app.state.config.RAG_AZURE_OPENAI_API_VERSION
         if app.state.config.RAG_EMBEDDING_ENGINE == "azure_openai"

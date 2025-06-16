@@ -403,6 +403,7 @@ def get_embedding_function(
     key,
     embedding_batch_size,
     azure_api_version=None,
+    embedding_threads: int = 1,
 ):
     if embedding_engine == "":
         return lambda query, prefix=None, user=None: embedding_function.encode(
@@ -423,14 +424,24 @@ def get_embedding_function(
         def generate_multiple(query, prefix, user, func):
             if isinstance(query, list):
                 embeddings = []
-                for i in range(0, len(query), embedding_batch_size):
-                    embeddings.extend(
-                        func(
-                            query[i : i + embedding_batch_size],
-                            prefix=prefix,
-                            user=user,
+                chunks = [
+                    query[i : i + embedding_batch_size]
+                    for i in range(0, len(query), embedding_batch_size)
+                ]
+
+                if embedding_threads > 1 and len(chunks) > 1:
+                    with ThreadPoolExecutor(max_workers=embedding_threads) as executor:
+                        futures = [
+                            executor.submit(func, chunk, prefix=prefix, user=user)
+                            for chunk in chunks
+                        ]
+                        for future in futures:
+                            embeddings.extend(future.result())
+                else:
+                    for chunk in chunks:
+                        embeddings.extend(
+                            func(chunk, prefix=prefix, user=user)
                         )
-                    )
                 return embeddings
             else:
                 return func(query, prefix, user)

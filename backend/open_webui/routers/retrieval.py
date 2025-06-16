@@ -244,6 +244,7 @@ async def get_status(request: Request):
         "embedding_model": request.app.state.config.RAG_EMBEDDING_MODEL,
         "reranking_model": request.app.state.config.RAG_RERANKING_MODEL,
         "embedding_batch_size": request.app.state.config.RAG_EMBEDDING_BATCH_SIZE,
+        "embedding_threads": request.app.state.config.RAG_EMBEDDING_THREADS,
     }
 
 
@@ -254,6 +255,7 @@ async def get_embedding_config(request: Request, user=Depends(get_admin_user)):
         "embedding_engine": request.app.state.config.RAG_EMBEDDING_ENGINE,
         "embedding_model": request.app.state.config.RAG_EMBEDDING_MODEL,
         "embedding_batch_size": request.app.state.config.RAG_EMBEDDING_BATCH_SIZE,
+        "embedding_threads": request.app.state.config.RAG_EMBEDDING_THREADS,
         "openai_config": {
             "url": request.app.state.config.RAG_OPENAI_API_BASE_URL,
             "key": request.app.state.config.RAG_OPENAI_API_KEY,
@@ -293,6 +295,7 @@ class EmbeddingModelUpdateForm(BaseModel):
     embedding_engine: str
     embedding_model: str
     embedding_batch_size: Optional[int] = 1
+    embedding_threads: Optional[int] = 1
 
 
 @router.post("/embedding/update")
@@ -341,6 +344,9 @@ async def update_embedding_config(
             request.app.state.config.RAG_EMBEDDING_BATCH_SIZE = (
                 form_data.embedding_batch_size
             )
+            request.app.state.config.RAG_EMBEDDING_THREADS = (
+                form_data.embedding_threads
+            )
 
         request.app.state.ef = get_ef(
             request.app.state.config.RAG_EMBEDDING_ENGINE,
@@ -370,6 +376,7 @@ async def update_embedding_config(
                 )
             ),
             request.app.state.config.RAG_EMBEDDING_BATCH_SIZE,
+            embedding_threads=request.app.state.config.RAG_EMBEDDING_THREADS,
             azure_api_version=(
                 request.app.state.config.RAG_AZURE_OPENAI_API_VERSION
                 if request.app.state.config.RAG_EMBEDDING_ENGINE == "azure_openai"
@@ -382,6 +389,7 @@ async def update_embedding_config(
             "embedding_engine": request.app.state.config.RAG_EMBEDDING_ENGINE,
             "embedding_model": request.app.state.config.RAG_EMBEDDING_MODEL,
             "embedding_batch_size": request.app.state.config.RAG_EMBEDDING_BATCH_SIZE,
+            "embedding_threads": request.app.state.config.RAG_EMBEDDING_THREADS,
             "openai_config": {
                 "url": request.app.state.config.RAG_OPENAI_API_BASE_URL,
                 "key": request.app.state.config.RAG_OPENAI_API_KEY,
@@ -1248,6 +1256,7 @@ def save_docs_to_vector_db(
                 )
             ),
             request.app.state.config.RAG_EMBEDDING_BATCH_SIZE,
+            embedding_threads=request.app.state.config.RAG_EMBEDDING_THREADS,
             azure_api_version=(
                 request.app.state.config.RAG_AZURE_OPENAI_API_VERSION
                 if request.app.state.config.RAG_EMBEDDING_ENGINE == "azure_openai"
