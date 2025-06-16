@@ -196,7 +196,9 @@ async def _reindex_task(app) -> None:
             files = Files.get_files_by_ids(file_ids)
             try:
                 if VECTOR_DB_CLIENT.has_collection(collection_name=knowledge_base.id):
-                    VECTOR_DB_CLIENT.delete_collection(collection_name=knowledge_base.id)
+                    VECTOR_DB_CLIENT.delete_collection(
+                        collection_name=knowledge_base.id
+                    )
             except Exception as e:
                 log.error(f"Error deleting collection {knowledge_base.id}: {str(e)}")
                 continue
@@ -207,7 +209,9 @@ async def _reindex_task(app) -> None:
                     await asyncio.to_thread(
                         process_file,
                         dummy_request,
-                        ProcessFileForm(file_id=file.id, collection_name=knowledge_base.id),
+                        ProcessFileForm(
+                            file_id=file.id, collection_name=knowledge_base.id
+                        ),
                         None,
                     )
                 except Exception as e:  # pragma: no cover - just log
