@@ -2149,6 +2149,12 @@ RAG_EMBEDDING_BATCH_SIZE = PersistentConfig(
     ),
 )
 
+RAG_EMBEDDING_THREADS = PersistentConfig(
+    "RAG_EMBEDDING_THREADS",
+    "rag.embedding_threads",
+    int(os.environ.get("RAG_EMBEDDING_THREADS", "1")),
+)
+
 RAG_EMBEDDING_QUERY_PREFIX = os.environ.get("RAG_EMBEDDING_QUERY_PREFIX", None)
 
 RAG_EMBEDDING_CONTENT_PREFIX = os.environ.get("RAG_EMBEDDING_CONTENT_PREFIX", None)

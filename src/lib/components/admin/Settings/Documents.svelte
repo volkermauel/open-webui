@@ -38,10 +38,11 @@
 	let showResetUploadDirConfirm = false;
 	let showReindexConfirm = false;
 
-	let embeddingEngine = '';
-	let embeddingModel = '';
-	let embeddingBatchSize = 1;
-	let rerankingModel = '';
+        let embeddingEngine = '';
+        let embeddingModel = '';
+        let embeddingBatchSize = 1;
+        let embeddingThreads = 1;
+        let rerankingModel = '';
 
 	let OpenAIUrl = '';
 	let OpenAIKey = '';
@@ -105,14 +106,15 @@
 		console.debug('Update embedding model attempt:', embeddingModel);
 
 		updateEmbeddingModelLoading = true;
-		const res = await updateEmbeddingConfig(localStorage.token, {
-			embedding_engine: embeddingEngine,
-			embedding_model: embeddingModel,
-			embedding_batch_size: embeddingBatchSize,
-			ollama_config: {
-				key: OllamaKey,
-				url: OllamaUrl
-			},
+                const res = await updateEmbeddingConfig(localStorage.token, {
+                        embedding_engine: embeddingEngine,
+                        embedding_model: embeddingModel,
+                        embedding_batch_size: embeddingBatchSize,
+                        embedding_threads: embeddingThreads,
+                        ollama_config: {
+                                key: OllamaKey,
+                                url: OllamaUrl
+                        },
 			openai_config: {
 				key: OpenAIKey,
 				url: OpenAIUrl
@@ -214,10 +216,11 @@
 	const setEmbeddingConfig = async () => {
 		const embeddingConfig = await getEmbeddingConfig(localStorage.token);
 
-		if (embeddingConfig) {
-			embeddingEngine = embeddingConfig.embedding_engine;
-			embeddingModel = embeddingConfig.embedding_model;
-			embeddingBatchSize = embeddingConfig.embedding_batch_size ?? 1;
+                if (embeddingConfig) {
+                        embeddingEngine = embeddingConfig.embedding_engine;
+                        embeddingModel = embeddingConfig.embedding_model;
+                        embeddingBatchSize = embeddingConfig.embedding_batch_size ?? 1;
+                        embeddingThreads = embeddingConfig.embedding_threads ?? 1;
 
 			OpenAIKey = embeddingConfig.openai_config.key;
 			OpenAIUrl = embeddingConfig.openai_config.url;
@@ -864,25 +867,41 @@
 							</div>
 						</div>
 
-						{#if embeddingEngine === 'ollama' || embeddingEngine === 'openai' || embeddingEngine === 'azure_openai'}
-							<div class="  mb-2.5 flex w-full justify-between">
-								<div class=" self-center text-xs font-medium">
-									{$i18n.t('Embedding Batch Size')}
-								</div>
+                                                {#if embeddingEngine === 'ollama' || embeddingEngine === 'openai' || embeddingEngine === 'azure_openai'}
+                                                        <div class="  mb-2.5 flex w-full justify-between">
+                                                                <div class=" self-center text-xs font-medium">
+                                                                        {$i18n.t('Embedding Batch Size')}
+                                                                </div>
 
-								<div class="">
-									<input
-										bind:value={embeddingBatchSize}
-										type="number"
-										class=" bg-transparent text-center w-14 outline-none"
-										min="-2"
-										max="16000"
-										step="1"
-									/>
-								</div>
-							</div>
-						{/if}
-					</div>
+                                                                <div class="">
+                                                                        <input
+                                                                               bind:value={embeddingBatchSize}
+                                                                               type="number"
+                                                                               class=" bg-transparent text-center w-14 outline-none"
+                                                                               min="-2"
+                                                                               max="16000"
+                                                                               step="1"
+                                                                        />
+                                                                </div>
+                                                        </div>
+                                                        <div class="  mb-2.5 flex w-full justify-between">
+                                                                <div class=" self-center text-xs font-medium">
+                                                                        {$i18n.t('Embedding Threads')}
+                                                                </div>
+
+                                                                <div class="">
+                                                                        <input
+                                                                               bind:value={embeddingThreads}
+                                                                               type="number"
+                                                                               class=" bg-transparent text-center w-14 outline-none"
+                                                                               min="1"
+                                                                               max="64"
+                                                                               step="1"
+                                                                        />
+                                                                </div>
+                                                        </div>
+                                                {/if}
+                                        </div>
 
 					<div class="mb-3">
 						<div class=" mb-2.5 text-base font-medium">{$i18n.t('Retrieval')}</div>

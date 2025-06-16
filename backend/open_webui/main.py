@@ -775,6 +775,7 @@ app.state.config.CHUNK_OVERLAP = CHUNK_OVERLAP
 app.state.config.RAG_EMBEDDING_ENGINE = RAG_EMBEDDING_ENGINE
 app.state.config.RAG_EMBEDDING_MODEL = RAG_EMBEDDING_MODEL
 app.state.config.RAG_EMBEDDING_BATCH_SIZE = RAG_EMBEDDING_BATCH_SIZE
+app.state.config.RAG_EMBEDDING_THREADS = RAG_EMBEDDING_THREADS
 
 app.state.config.RAG_RERANKING_ENGINE = RAG_RERANKING_ENGINE
 app.state.config.RAG_RERANKING_MODEL = RAG_RERANKING_MODEL
@@ -902,6 +903,7 @@ app.state.EMBEDDING_FUNCTION = get_embedding_function(
         )
     ),
     app.state.config.RAG_EMBEDDING_BATCH_SIZE,
+    embedding_threads=app.state.config.RAG_EMBEDDING_THREADS,
     azure_api_version=(
         app.state.config.RAG_AZURE_OPENAI_API_VERSION
         if app.state.config.RAG_EMBEDDING_ENGINE == "azure_openai"
