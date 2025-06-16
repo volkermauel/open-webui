@@ -2,6 +2,8 @@ from typing import List, Optional
 from pydantic import BaseModel
 from fastapi import APIRouter, Depends, HTTPException, status, Request
 import logging
+import asyncio
+import types
 
 from open_webui.models.knowledge import (
     Knowledges,
@@ -166,22 +168,16 @@ async def create_new_knowledge(
 ############################
 
 
-@router.post("/reindex", response_model=bool)
-async def reindex_knowledge_files(request: Request, user=Depends(get_verified_user)):
-    if user.role != "admin":
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail=ERROR_MESSAGES.UNAUTHORIZED,
-        )
-
+async def _reindex_task(app) -> None:
+    """Background task that reindexes all knowledge bases."""
+    dummy_request = types.SimpleNamespace(app=app)
     knowledge_bases = Knowledges.get_knowledge_bases()
 
     log.info(f"Starting reindexing for {len(knowledge_bases)} knowledge bases")
 
-    deleted_knowledge_bases = []
+    deleted_knowledge_bases: list[str] = []
 
     for knowledge_base in knowledge_bases:
-        # -- Robust error handling for missing or invalid data
         if not knowledge_base.data or not isinstance(knowledge_base.data, dict):
             log.warning(
                 f"Knowledge base {knowledge_base.id} has no data or invalid data ({knowledge_base.data!r}). Deleting."
@@ -189,7 +185,7 @@ async def reindex_knowledge_files(request: Request, user=Depends(get_verified_us
             try:
                 Knowledges.delete_knowledge_by_id(id=knowledge_base.id)
                 deleted_knowledge_bases.append(knowledge_base.id)
-            except Exception as e:
+            except Exception as e:  # pragma: no cover - just log
                 log.error(
                     f"Failed to delete invalid knowledge base {knowledge_base.id}: {e}"
                 )
@@ -205,28 +201,28 @@ async def reindex_knowledge_files(request: Request, user=Depends(get_verified_us
                     )
             except Exception as e:
                 log.error(f"Error deleting collection {knowledge_base.id}: {str(e)}")
-                continue  # Skip, don't raise
+                continue
 
-            failed_files = []
+            failed_files: list[dict] = []
             for file in files:
                 try:
-                    process_file(
-                        request,
+                    await asyncio.to_thread(
+                        process_file,
+                        dummy_request,
                         ProcessFileForm(
                             file_id=file.id, collection_name=knowledge_base.id
                         ),
-                        user=user,
+                        None,
                     )
-                except Exception as e:
+                except Exception as e:  # pragma: no cover - just log
                     log.error(
                         f"Error processing file {file.filename} (ID: {file.id}): {str(e)}"
                     )
                     failed_files.append({"file_id": file.id, "error": str(e)})
                     continue
 
-        except Exception as e:
+        except Exception as e:  # pragma: no cover - just log
             log.error(f"Error processing knowledge base {knowledge_base.id}: {str(e)}")
-            # Don't raise, just continue
             continue
 
         if failed_files:
@@ -239,6 +235,17 @@ async def reindex_knowledge_files(request: Request, user=Depends(get_verified_us
     log.info(
         f"Reindexing completed. Deleted {len(deleted_knowledge_bases)} invalid knowledge bases: {deleted_knowledge_bases}"
     )
+
+
+@router.post("/reindex", response_model=bool)
+async def reindex_knowledge_files(request: Request, user=Depends(get_verified_user)):
+    if user.role != "admin":
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail=ERROR_MESSAGES.UNAUTHORIZED,
+        )
+
+    asyncio.create_task(_reindex_task(request.app))
     return True
 
 
